@@ -6,7 +6,6 @@ import graphlab
 import numpy as np
 import theano
 import theano.tensor as T
-from theano import pp
 
 sales = graphlab.SFrame('kc_house_data.gl/')
 
