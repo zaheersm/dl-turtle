@@ -27,7 +27,7 @@ features = np.concatenate((bias, sqft_living, floors, bedrooms, bathrooms), axis
 
 # Initializng weight vectors
 init_weights = np.array([-47000.0, 1.0, 1.0, 1.0, 1.0])
-w = theano.shared(np.array(init_weights), 'w')
+w = theano.shared(init_weights, 'w')
 
 # Theano speicific symbolic equations
 X = T.dmatrix('X')
