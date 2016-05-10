@@ -2,14 +2,16 @@ from models import *
 
 class Handler:
 
-    def __init__(self):
+    def __init__(self, client):
 		
+		#set client_connection to currently connected node
+		self.client_connection = client
 		#initialize temporary cache
-        self.cache = None
+		self.cache = None
 		#initialize Convolution Neural Network
-        #self.model = new CNN() //constructor needs datasets to initialize
+		self.model = CNN(client) #constructor needs datasets to initialize
 
-    def handler(self, req):
+    def handle_request(self, req):
 		
 		#if client is sending some data add it to handler cache and await next command
         if(req[0:4] == 'data'):
@@ -28,22 +30,27 @@ class Handler:
             'stop' : self.stop,
             'load weights' : self.load_weights,
             'save_weights' : self.save_weights
-            }[command](...)
+            }[command]()
 
     def start(self):
         self.model.begin_training()
         
     def stop(self):
-        self.model.stop_training()
-
+        #self.model.stop_training()
+		a = 1
+		
     def load_weights(self, weights = None):
-        self.model.load_weights(weights)
-
+        #self.model.load_weights(weights)
+		a = 1
+		
     def save_weights(self):
-        return self.serialize(self.model.save_weights())
-
+        #self.client_connection.send(self.serialize(self.model.save_weights()))
+		a = 1
+		
     def serialize(self, data):
         #to be implemented
-		
-	def deserialize(self, stream):
+		a = 1
+
+'''	def deserialize(self, stream):
 		#to be implemented
+		a = 1'''
