@@ -14,9 +14,9 @@ class FC(object):
         high = np.sqrt (6./ (fan_in + fan_out))
         low = -high
         self.W = theano.shared(name = 'FC.W',
-                                value = np.asarray(rng.uniform(low = low, 
+                                value = rng.uniform(low = low, 
                                                     high = high,
-                                                    size = (fan_in, fan_out))),
+                                                    size = (fan_in, fan_out)),
                                 borrow = True)
         self.b = theano.shared(name = 'FC.b',
                                 value = np.zeros((fan_out,)),
