@@ -5,7 +5,7 @@ import theano.tensor as T
 from theano.tensor.nnet import conv2d
 from theano.tensor.signal import downsample
 
-class ConvPoolLayer(object):
+class ConvPool(object):
     
     def __init__ (self, input, input_shape, filter_shape, poolsize):
         
