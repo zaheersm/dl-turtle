@@ -31,7 +31,7 @@ def train(model, learning_rate = 0.1, n_epochs = 200,
         patience = 1000
         patience_increase = 2
         improvement_threshold = 0.995
-        validation_frequency = min(self.n_train_batches, patience // 2)
+        validation_frequency = min(model.n_train_batches, patience // 2)
         best_validation_loss = np.inf
         best_iter = 0
         test_score = 0.
