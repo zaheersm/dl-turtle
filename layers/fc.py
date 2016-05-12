@@ -1,8 +1,7 @@
-import theano
-import theano.tensor as T
-
 import numpy as np
 
+import theano
+import theano.tensor as T
 '''
     FC represents a fully-connected layer
 '''

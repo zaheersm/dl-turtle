@@ -18,7 +18,8 @@ class ConvPool(object):
         fan_in = np.prod(filter_shape[1:])
     
         # fan_out : (n_out_maps * filter_width * filter_height)/poolsize
-        fan_out = (filter_shape[0] * np.prod(filter_shape[2:]) // np.prod(poolsize))
+        fan_out = (filter_shape[0] *  np.prod(filter_shape[2:]) // \
+                    np.prod(poolsize))
 
         W_bound = np.sqrt(6./ (fan_in + fan_out))
 
