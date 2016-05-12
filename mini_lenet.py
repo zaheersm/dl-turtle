@@ -56,8 +56,8 @@ class MiniLenet(object):
         self.prob_y = self.layer3.prob_y
         self.pred_y = self.layer3.pred_y
 
-        self.params = self.layer0.params + self.layer1.params + \
-                        self.layer2.params + self.layer3.params
+        self.params = self.layer3.params + self.layer2.params + \
+                        self.layer1.params + self.layer0.params
 
         self.batch_size = batch_size
 

@@ -23,18 +23,15 @@ def train(model, learning_rate = 0.1, n_epochs = 200,
             persist_name = 'model_params.pkl'):
         # Symbolic variable to represent the index of minibatch
         index = T.lscalar()
-        #print ('0') 
         test_model = model.get_test_func(index)
         validate_model = model.get_valid_func(index)
         train_model = model.get_train_func(index, learning_rate)
-        #print('-1')
         print('... training')
         # early-stopping parameters
         patience = 1000
         patience_increase = 2
         improvement_threshold = 0.995
-        #validation_frequency = min(self.n_train_batches, patience // 2)
-        validation_frequency = 5
+        validation_frequency = min(self.n_train_batches, patience // 2)
         best_validation_loss = np.inf
         best_iter = 0
         test_score = 0.
@@ -48,9 +45,7 @@ def train(model, learning_rate = 0.1, n_epochs = 200,
 
                 if iter % 100 == 0:
                     print('training @ iter = ', iter)
-                #print ('1')
                 cost_ij = train_model(minibatch_index)
-                #print ('2')
                 if (iter + 1) % validation_frequency == 0:
 
                     # compute zero-one loss on validation set
