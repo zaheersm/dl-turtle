@@ -20,14 +20,13 @@ class MiniLenet(object):
         batch_size: Scalar  | No of images to see at an instance for updating 
         gradient
         '''     
-        rng = np.random.RandomState(1234)
         # Dimensions of X: (batch_size, channels, height, width)
         self.X = T.tensor4('Input_Image')
     
         # Dimensions of y: (batch_size, ) 
         self.y = T.ivector('Target_Class')
         
-        self.layer0 = ConvPool(self.X, input_shape = image_shape, 
+        self.layer0 = ConvPool(self.X, 
                                 filter_shape = (nfilters[0],
                                                 image_shape[0], 3, 3),
                                 poolsize = (2,2))
@@ -36,9 +35,6 @@ class MiniLenet(object):
                         (image_shape[2]-3+1)//2)
         
         self.layer1 = ConvPool(self.layer0.output,
-                                input_shape = (batch_size, l0_out_shape[0],
-                                                l0_out_shape[1], 
-                                                l0_out_shape[2]),
                                 filter_shape = (nfilters[1], nfilters[0], 3, 3),
                                 poolsize = (2,2)) 
         

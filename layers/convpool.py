@@ -7,7 +7,7 @@ from theano.tensor.signal import downsample
 
 class ConvPool(object):
     
-    def __init__ (self, input, input_shape, filter_shape, poolsize):
+    def __init__ (self, input, filter_shape, poolsize):
         
         # Initializing a random number generator for initializing 
         # weight filters
