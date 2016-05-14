@@ -9,10 +9,12 @@ from layers.convpool import ConvPool
 from layers.fc import FC
 from layers.softmax import SoftMax
 
+from utils.load import shared_dataset
+
 class Architecture(object):
 
     def __init__ (self, specs):
-        self.specs = json.loads(specs)
+        self.specs = specs
         # Number of layers in DeepNet
         nl = len(self.specs) - 1
 
@@ -39,16 +41,17 @@ class Architecture(object):
             self.params += self.layer[i].params
 
         self.batch_size = self.specs["meta"]["batch_size"]
+        self.nl = nl
 
     def init_first_layer(self):
         
         layer_type = self.specs["layer0"]["type"]
-        input_shape = self.specs["layer0"]["input_shape"]
+        input_shape = self.specs["meta"]["input_shape"]
+        # Dimensions of X: (batch_size, channels, height, weight)
+        self.X = T.tensor4('Input_Image')
+        self.y = T.ivector('Target_Class')
+
         if layer_type == "convpool":
-            # Dimensions of X: (batch_size, channels, height, width)
-            self.X = T.tensor4('Input_Image')
-            self.y = T.ivector('Target_Class')
-        
             n_filters = self.specs["layer0"]["n_filters"]
             poolsize = self.specs["layer0"]["poolsize"]
  
@@ -60,21 +63,18 @@ class Architecture(object):
             self.lout_shape[0] = (n_filters, (input_shape[1]-3+1)//2,
                                         (input_shape[2]-3+1)//2)
         elif layer_type == "fc":
-            self.X = T.matrix('Input_Image')
-            self.y = T.ivector('Target_Class')
             # For FC, input_shape should be of rasterized image
             units = self.specs["layer0"]["units"]
-            self.layer[0] = FC(self.X, fan_in = np.prod(input_shape),
+            self.layer[0] = FC(self.X.flatten(2), 
+                                fan_in = np.prod(input_shape),
                                 fan_out = units)
             self.lout_shape[0] = (units,)
 
             
         elif layer_type == "softmax":
-            self.X = T.matrix('Input_Image')
-            self.y = T.ivector('Target_Class')
             # For SoftMax, input_shape should be of rasterized image
             units = self.specs["layer0"]["units"]
-            self.layer[0] = SoftMax(self.X, 
+            self.layer[0] = SoftMax(self.X.flatten(2), 
                                 n_in = np.prod(input_shape),
                                 n_out = units)
             self.lout_shape[0] = (units,)
@@ -82,7 +82,7 @@ class Architecture(object):
             # TODO: Throw Exception
             print 'Invalid Layer Type'
 
-        print self.lout_shape[0]
+        #print self.lout_shape[0]
 
     def init_layer(self, index):
         
@@ -117,14 +117,60 @@ class Architecture(object):
                                 n_out = units)
             self.lout_shape[index] = (units,)
             
-        print self.lout_shape[index]
+        #print self.lout_shape[index]
 
-if __name__ == '__main__':
+    def load (self, train, valid, test):
+        """
+            train : (X, y) 
+            valid : (X, y)
+            test  : (X, y)
+            where X is a 4D numpy matrix and y is a numpy vector/python list
+        """
+        self.train_set_x, self.train_set_y = shared_dataset(train)
+        self.valid_set_x, self.valid_set_y = shared_dataset(valid)
+        self.test_set_x, self.test_set_y = shared_dataset(test)
 
-    specs = '{"meta": {"input":"cifar", "batch_size":500}, ' + \
-            '"layer0":{"type":"convpool","input_shape":[3,32,32], ' + \
-            '"n_filters":30, "poolsize":[2,2]}, ' + \
-            '"layer1":{"type":"fc", "units":500}, ' + \
-            '"layer2":{"type":"softmax", "units": 10}}'
-    net = Architecture(specs)
+        n_train = self.train_set_x.get_value(borrow=True).shape[0]
+        n_valid = self.valid_set_x.get_value(borrow=True).shape[0]
+        n_test = self.test_set_x.get_value(borrow=True).shape[0]
 
+        self.n_train_batches = n_train // self.batch_size
+        self.n_valid_batches = n_valid // self.batch_size
+        self.n_test_batches = n_test // self.batch_size
+
+    def get_train_func(self, index, learning_rate):
+        '''
+        get_train_func returns a theano func which optimizer could use to
+        update parameters of the model
+        '''
+        grads = T.grad(self.cost, self.params)
+
+        updates = [(param_i, param_i - learning_rate * grad_i)
+                    for param_i, grad_i in zip(self.params, grads)]
+
+        givens  = {self.X : self.train_set_x[index*self.batch_size :
+                                            (index+1)*self.batch_size],
+                    self.y : self.train_set_y[index*self.batch_size :
+                                            (index+1)*self.batch_size]}
+        return theano.function([index], self.cost, updates=updates,
+                                givens=givens)
+
+    def get_valid_func(self, index):
+        givens = {self.X : self.valid_set_x[index*self.batch_size :
+                                            (index+1)*self.batch_size],
+                    self.y : self.valid_set_y[index*self.batch_size :
+                                            (index+1)*self.batch_size]}
+        return theano.function(
+                [index],
+                self.layer[self.nl-1].errors(self.y),
+                givens=givens)
+
+    def get_test_func(self, index):
+        givens = {self.X : self.test_set_x[index*self.batch_size :
+                                            (index+1)*self.batch_size],
+                    self.y : self.test_set_y[index*self.batch_size :
+                                            (index+1)*self.batch_size]}
+        return theano.function(
+                [index],
+                self.layer[self.nl-1].errors(self.y),
+                givens=givens)
