@@ -1,5 +1,5 @@
 import socket
-from utility import *
+from handler import Handler
 
 #initialize a TCP server
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -10,12 +10,12 @@ server.bind(serving_address)
 server.listen(1)
 
 while True:
-	print 'waiting for client app'
+        print 'waiting for client app'
 	#await connection
 	connection, client_address = server.accept()
 	handler = Handler(connection)
 	
-	try:
+        try:
 		#show client address
 		print 'connection from', client_address
 		

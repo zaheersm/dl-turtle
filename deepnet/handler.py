@@ -1,4 +1,4 @@
-from models import *
+from architecture import Architecture
 
 class Handler:
 
@@ -9,7 +9,7 @@ class Handler:
 		#initialize temporary cache
 		self.cache = None
 		#initialize Convolution Neural Network
-		self.model = CNN(client) #constructor needs datasets to initialize
+		#self.model = Architecture(client) #constructor needs datasets to initialize
 
     def handle_request(self, req):
 		
