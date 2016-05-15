@@ -5,37 +5,31 @@ in JSON format
 import six.moves.cPickle as pickle
 import json
 
-import theano
-import theano.tensor as T
-
-from mini_lenet import MiniLenet
 from optimizer.early_stop import train
 from architecture import Architecture
 
 if __name__ == '__main__':
     
-    '''
+    ''' 
     # Specs for Logisitic Regression [SoftMax]
-    specs = '{"meta": {"dataset":"mnist", "batch_size":20, ' + \
+    specs = '{"meta": {"dataset":"MNIST", "batch_size":20, ' + \
             '"input_shape":[1,28,28]}, ' + \
-            '"layer0":{"type":"softmax", "units":10}}
-    
+            '"layers":[{"type":"softmax", "units":10}]}'
     # Specs for MLP : FC -> Softmax
-    specs = '{"meta": {"dataset":"mnist", "batch_size":20, ' + \
+    specs = '{"meta": {"dataset":"MNIST", "batch_size":20, ' + \
             '"input_shape":[1,28,28]}, ' + \
-            '"layer0":{"type":"fc", "units":500, "input_shape":[1,28,28]}, '+\
-            '"layer1":{"type":"softmax", "units": 10}}'
+            '"layers":[{"type":"fc", "units":500},'+\
+            '{"type":"softmax", "units": 10}]}'
     '''
-
     # Specs for ConvNet: ConvPool -> ConvPool -> FC -> SoftMax
-    specs = '{"meta": {"dataset":"mnist", "batch_size":500, ' + \
+    specs = '{"meta": {"dataset":"MNIST", "batch_size":500, ' + \
             '"input_shape":[1,28,28]}, ' + \
-            '"layer0":{"type":"convpool", "n_filters":30, ' + \
+            '"layers":[{"type":"convpool", "n_filters":30, ' + \
             '"poolsize":[2,2]}, ' + \
-            '"layer1":{"type":"convpool", "n_filters":75, '+ \
+            '{"type":"convpool", "n_filters":75, '+ \
             '"poolsize":[2,2]}, ' + \
-            '"layer2":{"type":"fc", "units":500}, ' + \
-            '"layer3":{"type":"softmax", "units": 10}}'
+            '{"type":"fc", "units":500}, ' + \
+            '{"type":"softmax", "units": 10}]}'
 
     specs = json.loads(specs) 
     net = Architecture(specs)
