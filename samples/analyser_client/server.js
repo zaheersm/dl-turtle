@@ -8,6 +8,10 @@ app.use(express.static('public'));
 var client = new net.Socket();
 
 app.get('/', function(req, res){
+  res.sendFile(__dirname + '/model.html')
+});
+
+app.get('/demo', function(req, res){
   res.sendFile(__dirname + '/index.html')
 });
 
@@ -41,12 +45,7 @@ http.listen(3000, function(){
 }, 100)*/
 
 client.on('data', function(data) {
-	if(data.toString().indexOf('iteration') != -1){
-		var iter = parseInt(data.toString().substring(10)) * Math.random()
-        if(connected_socket != 0){
-		  io.emit('data', iter)
-        }
-	}
+	io.emit('cal', data.toString())
 });
 
 client.on('close', function() {
