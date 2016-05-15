@@ -1,4 +1,7 @@
+import json
+
 from architecture import Architecture
+from optimizer.early_stop import train
 
 class Handler:
   def __init__(self, client):
@@ -7,6 +10,7 @@ class Handler:
     #initialize temporary cache
     self.cache = None
     #initialize Convolution Neural Network
+    self.model = None
     #self.model = Architecture(client) #constructor needs datasets to initialize
     
     def handle_request(self, req):
@@ -30,7 +34,7 @@ class Handler:
       }[command]()
     
     def start(self):
-      self.model.begin_training()
+      train(self.model, 0.1)
       
     def stop(self):
       #self.model.stop_training()
@@ -47,7 +51,18 @@ class Handler:
     def serialize(self, data):
       #to be implemented
       a = 1
-      
-'''	def deserialize(self, stream):
-      #to be implemented
-      a = 1'''
+    
+    def create_model(self, specs):
+        specs = json.loads(specs)
+        self.model = Architecture(specs)
+        dataset = specs["meta"]["dataset"]
+
+        train_set = pickle.load(open(dataset + '/training_set.pkl', 'rb'))
+        valid_set = pickle.load(open(dataset + '/validation_set.pkl', 'rb'))
+        test_set = pickle.load(open(dataset + '/test_set.pkl', 'rb'))
+
+        train_set = (train_set['trainX'], train_set['trainY'])
+        valid_set = (valid_set['validX'], valid_set['validY'])
+        test_set = (test_set['testX'], test_set['testY'])
+
+        self.model.load(train_set, valid_set, test_set)
