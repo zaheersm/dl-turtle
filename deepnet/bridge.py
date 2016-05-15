@@ -29,7 +29,7 @@ while True:
         break
       if req[0:1] == '{':
         #checkout model from here
-        self.handler.create_model(req) 
+        handler.create_model(req) 
         print 'model recieved'
       else:
         handler.handle_request(req)

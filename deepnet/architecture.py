@@ -133,7 +133,7 @@ class Architecture(object):
         n_train = self.train_set_x.get_value(borrow=True).shape[0]
         n_valid = self.valid_set_x.get_value(borrow=True).shape[0]
         n_test = self.test_set_x.get_value(borrow=True).shape[0]
-
+        
         self.n_train_batches = n_train // self.batch_size
         self.n_valid_batches = n_valid // self.batch_size
         self.n_test_batches = n_test // self.batch_size
@@ -174,3 +174,14 @@ class Architecture(object):
                 [index],
                 self.layer[self.nl-1].errors(self.y),
                 givens=givens)
+
+    def get_samples_prob(self, indices):
+        # Indices is a vector of random ints between 0 - size(test)
+        givens = {self.X : self.test_set_x[indices],
+                    self.y : self.test_set_y[indices]
+        }
+        
+        return theano.function(
+            [indices],
+            self.prob_y,
+            givens=givens, on_unused_input='ignore')
