@@ -10,25 +10,29 @@ server.bind(serving_address)
 server.listen(1)
 
 while True:
-        print 'waiting for client app'
-	#await connection
-	connection, client_address = server.accept()
-	handler = Handler(connection)
-	
-        try:
-		#show client address
-		print 'connection from', client_address
-		
-		#start conversation
-		while True:
-			req = connection.recv(65536)
-			print req, 'requested'
-			
-			#pass request to handler
-			if req == 'stop':
-				break
-			handler.handle_request(req)
-	finally:
-		#close connection when client is no more there
-		connection.close()
-		print 'connection closed'
+  print 'waiting for client app'
+  #await connection
+  connection, client_address = server.accept()
+  handler = Handler(connection)
+  
+  try:
+    #show client address
+    print 'connection from', client_address
+    #start conversation
+    
+    while True:
+      req = connection.recv(65536)
+      print req, 'requested'
+      
+      #pass request to handler
+      if req == 'stop':
+        break
+      if req[0:1] == '{':
+        #checkout model from here
+        print 'model recieved'
+      else:
+        handler.handle_request(req)
+  finally:
+    #close connection when client is no more there
+    connection.close()
+    print 'connection closed'
