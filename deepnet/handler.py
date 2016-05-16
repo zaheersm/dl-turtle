@@ -8,12 +8,14 @@ class Handler:
     
     def __init__(self, client):
         #set client_connection to currently connected node
-        self.client_connection = client
+        self.client = client
         #initialize temporary cache
         self.cache = None
         #initialize Convolution Neural Network
         self.model = None
-    
+        
+        self.train = False
+           
     def handle_request(self, req):
     #if client is sending some data add it to handler cache and 
     #await next command
@@ -36,10 +38,11 @@ class Handler:
         }[command]()
     
     def start(self):
-        train(self.model, 0.1)
+        self.train = True
+        train(self, self.model, 0.1)
       
     def stop(self):
-        #self.model.stop_training()
+        self.train = False
         a = 1
 
     def load_weights(self, weights = None):

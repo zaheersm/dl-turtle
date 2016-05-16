@@ -6,10 +6,10 @@
 
 //layers: building blocks for building up model
 var layers = {
-  'convpool': [{color: 'green', text: 'Convpool', x: 20, y: 100, extras: {filter_size: 70, pool_size: [2,2]}}],
+  'convpool': [{color: 'green', text: 'Convpool', x: 20, y: 100, extras: {n_filters: 70, poolsize: [2,2]}}],
   softmax: [{color: 'red', text: 'Softmax', x: 20, y: 200, extras: {units: 10}}],
   fc: [{color: '#DF9300', text: 'Fully Connected', x: 150, y: 200, extras: {units: 500}}],
-  input: [{color: 'black', text: 'MNIST', x: 280, y: 100, extras: {batch_size: 500}},{color: 'black', text: 'CIFAR', x: 20, y: 300, extras: {batch_size: 500}}],
+  input: [{color: 'black', text: 'MNIST', x: 280, y: 100, extras: {batch_size: 4}},{color: 'black', text: 'CIFAR', x: 20, y: 300, extras: {batch_size: 500}}],
   output: [{color: 'black', text: 'Output', x: 180, y: 300, extras: {}}]
 }
 
@@ -157,7 +157,7 @@ function extractor(){
       break
     }
   }
-  var layermap = {meta : {'dataset' : olayers[0].type, batch_size: 500, input_shape: [1, 28, 28]}, layers: []}
+  var layermap = {meta : {'dataset' : olayers[0].type, batch_size: olayers[0].batch_size, input_shape: [1, 28, 28]}, layers: []}
 
   for(var i = 1; i < olayers.length -1; i++){
     layermap.layers.push(olayers[i])
@@ -245,7 +245,7 @@ function add_layers(layers){
 
 //checks if connection constructed satifies constrains
 function satisfy_constraints(input, output){
-  return constraints[input.getAttr('name')].includes(output.getAttr('name'))
+  return constraints[input.getAttr('name')].indexOf(output.getAttr('name')) > -1
 }
 
 //arranges arrow properly on draggin objects

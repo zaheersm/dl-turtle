@@ -24,7 +24,6 @@ socket.on('cal', function(val){
             var li = $(ele).find('.outer')[j]
             $(li).find('.lable').html(data.labels[i][j])
             $(li).find('.inner').attr("data-progress", data.probs[i][j].toFixed(2) * 100 + "%")
-            console.log(data.probs[i][j]+ " --> " + data.probs[i][j].toFixed(2) * 100)
         }
     }
     render_vals()

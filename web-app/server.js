@@ -26,7 +26,7 @@ io.on('connection', function(socket){
       server_connected = false
     }
     else{
-      client.connect(4777, '127.0.0.1', function() {
+      client.connect(4784, '127.0.0.1', function() {
         console.log('Connected');
         client.write(msg);
         server_connected = true

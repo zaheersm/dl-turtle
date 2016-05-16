@@ -3,7 +3,7 @@ from handler import Handler
 
 #initialize a TCP server
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-serving_address = ('localhost', 4777)
+serving_address = ('localhost', 4784)
 server.bind(serving_address)
 
 #fire up server
@@ -25,8 +25,8 @@ while True:
       print req, 'requested'
       
       #pass request to handler
-      if req == 'stop':
-        break
+      #if req == 'stop':
+      #  handler.stop()
       if req[0:1] == '{':
         #checkout model from here
         handler.create_model(req) 
