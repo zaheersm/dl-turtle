@@ -39,7 +39,7 @@ class Handler:
     
     def start(self):
         self.train = True
-        train(self, self.model, 0.1)
+        train(self.model, handler=self, learning_rate=0.1)
       
     def stop(self):
         self.train = False

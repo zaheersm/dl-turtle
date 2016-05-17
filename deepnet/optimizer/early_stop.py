@@ -6,7 +6,6 @@ train method below is taken from deeplearning.net tutorial for early stopping
 It has been slightly rebuffed inorder to integrate it with other parts of this
 project
 """
-
 from __future__ import print_function
 
 import sys
@@ -36,16 +35,24 @@ def get_top_three(data):
         data[np.arange(n), indices[:, i]] = -1
     return (values, indices)
 
-def train(handler, model, learning_rate = 0.1, n_epochs = 200, 
+def train(model, handler = None, learning_rate = 0.1, n_epochs = 200, 
             persist_name = 'model_params.pkl'):
+        
         # Symbolic variable to represent the index of minibatch
         index = T.lscalar()
         test_model = model.get_test_func(index)
         validate_model = model.get_valid_func(index)
         train_model = model.get_train_func(index, learning_rate)
-        indices = T.ivector()
-        samples_prob = model.get_samples_prob(indices)
-        test_size = model.test_set_x.get_value().shape[0]
+        
+
+        # We need samples only if a web-interface has passed a handler
+        if handler != None:
+            indices = T.ivector()
+            samples_prob = model.get_samples_prob(indices)
+            test_size = model.test_set_x.get_value().shape[0]
+            input_shape = model.specs["meta"]["input_shape"]
+         
+        
         print('... training')
         # early-stopping parameters
         patience = 1000
@@ -62,8 +69,9 @@ def train(handler, model, learning_rate = 0.1, n_epochs = 200,
         while (epoch < n_epochs) and (not done_looping):
             epoch = epoch + 1
             for minibatch_index in range(model.n_train_batches):
-                if handler.train == False:
-                    return
+                #
+                #if handler != None:
+                #    return
                 
                 iter = (epoch - 1) * model.n_train_batches + minibatch_index
 
@@ -71,27 +79,34 @@ def train(handler, model, learning_rate = 0.1, n_epochs = 200,
                     print('training @ iter = ', iter)
                 cost_ij = train_model(minibatch_index)
                 if (iter + 1) % validation_frequency == 0:
-                    rindices = np.array(np.random.randint(0, test_size, 3),
-                                        dtype=np.int32)
-                    max_probs, max_labels = get_top_three(
-                                                samples_prob(rindices))
-                    sample_images = model.test_set_x.get_value()[rindices]
-                    sample_images = sample_images.reshape(len(rindices), 28, 28)
-                    image_ary = []
-                    for i in range(len(sample_images)):
-                        image = np.uint8(sample_images[i]*255)
-                        _buffer = cStringIO.StringIO()
-                        Image.fromarray(image).convert('L').save(_buffer,
-                                                            format = 'JPEG')
-                        image_str = 'data:image/jpeg;base64,' + \
-                                    base64.b64encode(_buffer.getvalue())
-                        image_ary += [image_str]
-                    info = {"images":image_ary,
-                            "probs":max_probs.tolist(),
-                            "labels":max_labels.tolist(),
-                            "iteration": cost_ij.item()}
-                    info_json = json.dumps(info)
-                    handler.client.send(info_json)
+                    
+                    if handler != None:
+                        rindices = np.array(np.random.randint(0, test_size, 3),
+                                            dtype=np.int32)
+                        max_probs, max_labels = get_top_three(
+                                                    samples_prob(rindices))
+                        sample_images = model.test_set_x.get_value()[rindices]
+                        
+                        image_ary = []
+                        for i in range(len(sample_images)):
+                            im = sample_images[i].copy()
+                            im = np.rollaxis(np.rollaxis(im,2,0), 2, 0)
+                            im = np.uint8(im)
+                            _buffer = cStringIO.StringIO()
+                            Image.fromarray(im).save(_buffer,
+                                                    format = 'JPEG')
+                            image_str = 'data:image/jpeg;base64,' + \
+                                        base64.b64encode(_buffer.getvalue())
+                            image_ary += [image_str]
+                        
+                        info = {"images":image_ary,
+                                "probs":max_probs.tolist(),
+                                "labels":max_labels.tolist(),
+                                "iteration": cost_ij.item()}
+                        
+                        info_json = json.dumps(info)
+                        handler.client.send(info_json)
+                    
                     # compute zero-one loss on validation set
                     validation_losses = [validate_model(i) for i
                                          in range(model.n_valid_batches)]

@@ -9,7 +9,7 @@ var layers = {
   'convpool': [{color: 'green', text: 'Convpool', x: 20, y: 100, extras: {n_filters: 70, poolsize: [2,2]}}],
   softmax: [{color: 'red', text: 'Softmax', x: 20, y: 200, extras: {units: 10}}],
   fc: [{color: '#DF9300', text: 'Fully Connected', x: 150, y: 200, extras: {units: 500}}],
-  input: [{color: 'black', text: 'MNIST', x: 280, y: 100, extras: {batch_size: 4}},{color: 'black', text: 'CIFAR', x: 20, y: 300, extras: {batch_size: 500}}],
+  input: [{color: 'black', text: 'MNIST', x: 280, y: 100, extras: {batch_size: 4, input_shape:[1,28,28]}},{color: 'black', text: 'CIFAR', x: 20, y: 300, extras: {batch_size: 500, input_shape: [3,32,32]}}],
   output: [{color: 'black', text: 'Output', x: 180, y: 300, extras: {}}]
 }
 
@@ -157,7 +157,7 @@ function extractor(){
       break
     }
   }
-  var layermap = {meta : {'dataset' : olayers[0].type, batch_size: olayers[0].batch_size, input_shape: [1, 28, 28]}, layers: []}
+  var layermap = {meta : {'dataset' : olayers[0].type, batch_size: olayers[0].batch_size, input_shape: olayers[0].input_shape}, layers: []}
 
   for(var i = 1; i < olayers.length -1; i++){
     layermap.layers.push(olayers[i])
