@@ -119,7 +119,7 @@ class Architecture(object):
             
         #print self.lout_shape[index]
 
-    def load (self, train, valid, test):
+    def load (self, train, valid, test, label_names):
         """
             train : (X, y) 
             valid : (X, y)
@@ -129,6 +129,7 @@ class Architecture(object):
         self.train_set_x, self.train_set_y = shared_dataset(train)
         self.valid_set_x, self.valid_set_y = shared_dataset(valid)
         self.test_set_x, self.test_set_y = shared_dataset(test)
+        self.label_names = label_names
 
         n_train = self.train_set_x.get_value(borrow=True).shape[0]
         n_valid = self.valid_set_x.get_value(borrow=True).shape[0]

@@ -39,7 +39,8 @@ class Handler:
     
     def start(self):
         self.train = True
-        train(self.model, handler=self, learning_rate=0.1)
+        train(self.model, 0.1, 200, 'model_params.pkl', sampling=True, 
+                handler=self)
       
     def stop(self):
         self.train = False
@@ -62,12 +63,14 @@ class Handler:
         self.model = Architecture(specs)
         dataset = specs["meta"]["dataset"]
 
-        train_set = pickle.load(open(dataset + '/training_set.pkl', 'rb'))
-        valid_set = pickle.load(open(dataset + '/validation_set.pkl', 'rb'))
-        test_set = pickle.load(open(dataset + '/test_set.pkl', 'rb'))
-
+        train_set = pickle.load(open('../'+dataset + '/training_set.pkl', 'rb'))
+        valid_set = pickle.load(open('../'+dataset + '/validation_set.pkl', 
+                                    'rb'))
+        test_set = pickle.load(open('../'+dataset + '/test_set.pkl', 'rb'))
+        
+        label_names = train_set['label_names']
+        
         train_set = (train_set['trainX'], train_set['trainY'])
         valid_set = (valid_set['validX'], valid_set['validY'])
         test_set = (test_set['testX'], test_set['testY'])
-
-        self.model.load(train_set, valid_set, test_set)
+        self.model.load(train_set, valid_set, test_set, label_names)
