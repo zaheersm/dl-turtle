@@ -47,10 +47,20 @@ class ImageSampler(object):
         for i in range(len(sample_images)):
             im = sample_images[i].copy()
             im = np.rollaxis(np.rollaxis(im,2,0), 2, 0)
-            im = np.uint8(im)
-            _buffer = cStringIO.StringIO()
-            Image.fromarray(im).save(_buffer,
+            
+            if self.input_shape[0] == 1: # If Images have 1 channel (grayscale)
+                im = np.uint8(im*255).reshape(self.input_shape[1],
+                                                self.input_shape[2])
+                _buffer = cStringIO.StringIO()
+                im = Image.fromarray(im)
+                im.convert('L').save(_buffer,
+                                        format = 'JPEG')
+            else:       # If images have 3-channels (RGB)
+                im = np.uint8(im)
+                _buffer = cStringIO.StringIO()
+                Image.fromarray(im).save(_buffer,
                                     format = 'JPEG')
+            
             image_str = 'data:image/jpeg;base64,' + \
                             base64.b64encode(_buffer.getvalue())
             image_ary += [image_str]

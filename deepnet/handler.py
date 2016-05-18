@@ -67,9 +67,11 @@ class Handler:
         valid_set = pickle.load(open('../'+dataset + '/validation_set.pkl', 
                                     'rb'))
         test_set = pickle.load(open('../'+dataset + '/test_set.pkl', 'rb'))
-        
-        label_names = train_set['label_names']
-        
+        try: 
+            label_names = train_set['label_names']
+        except KeyError:
+            label_names = range(10)
+
         train_set = (train_set['trainX'], train_set['trainY'])
         valid_set = (valid_set['validX'], valid_set['validY'])
         test_set = (test_set['testX'], test_set['testY'])
