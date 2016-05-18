@@ -8,8 +8,8 @@
 var layers = {
   'convpool': [{color: 'green', text: 'Convpool', x: 20, y: 100, extras: {n_filters: 70, poolsize: [2,2]}}],
   softmax: [{color: 'red', text: 'Softmax', x: 20, y: 200, extras: {units: 10}}],
-  fc: [{color: '#DF9300', text: 'Fully Connected', x: 150, y: 200, extras: {units: 500}}],
-  input: [{color: 'black', text: 'MNIST', x: 280, y: 100, extras: {batch_size: 4, input_shape:[1,28,28]}},{color: 'black', text: 'CIFAR', x: 20, y: 300, extras: {batch_size: 500, input_shape: [3,32,32]}}],
+  fc: [{color: '#DF9300', text: 'Fully Connected', x: 130, y: 200, extras: {units: 500}}],
+  input: [{color: '#0078ff', text: 'MNIST', x: 200, y: 100, extras: {batch_size: 4, input_shape:[1,28,28]}},{color: '#0078ff', text: 'CIFAR', x: 20, y: 300, extras: {batch_size: 500, input_shape: [3,32,32]}}],
   output: [{color: 'black', text: 'Output', x: 180, y: 300, extras: {}}]
 }
 
@@ -61,36 +61,84 @@ var lineLayer = new Konva.Layer()
 var prop_layer = new Konva.Layer();
 
 //space for toolbox at right side
-var right_rect = new Konva.Rect({
-  x: stage.getWidth() - 400,
-  y: 0,
-  width: 400,
-  height: stage.getHeight(),
+var tool_rect = new Konva.Rect({
+  width: 300,
+  height: stage.getHeight() - 200,
   fill: 'whitesmoke',
-  stroke: 'whitesmoke',
-  strokeWidth: 1
+  stroke: 'white',
+  strokeWidth: 2,
+  cornerRadius: 5
 })
 
 //lable for toolbox
-var right_text = new Konva.Text({
-  x: stage.getWidth() - 390,
-  y: 15,
-  text: 'Layers',
-  fontSize: 32,
+var tool_text = new Konva.Text({
+  x: 10,
+  y: 10,
+  text: 'Tools',
+  fontSize: 18,
   fontFamily: 'Calibri',
   fill: '#999'
 });
+
+var tool_line = new Konva.Line({
+  points: [2, 30, 298, 30],
+  stroke: '#ddd',
+  strokeWidth: 1,
+  lineCap: 'round',
+  lineJoin: 'round'
+});
+
+
+var tool_group = new Konva.Group({
+  x: 10,
+  y: 10,
+  draggable: true,
+  id: 'tool'
+})
+
+var prop_group = new Konva.Group({
+  x: stage.getWidth() - 310,
+  y: 10,
+  draggable: false,
+  id: 'prop_window'
+})
 
 //** adding property window
 
 var propery_text = new Konva.Text({
-  x: stage.getWidth() - 390,
-  y: 580,
+  x: 10,
+  y: 10,
   text: 'Properties',
-  fontSize: 24,
+  fontSize: 18,
   fontFamily: 'Calibri',
   fill: '#999'
 });
+
+var prop_rect = new Konva.Rect({
+  width: 300,
+  height: 200,
+  fill: 'whitesmoke',
+  stroke: 'white',
+  strokeWidth: 2,
+  cornerRadius: 5
+})
+
+var prop_line = new Konva.Line({
+  points: [2, 30, 298, 30],
+  stroke: '#ddd',
+  strokeWidth: 1,
+  lineCap: 'round',
+  lineJoin: 'round'
+});
+
+prop_group.add(prop_rect)
+prop_group.add(prop_line)
+prop_group.add(propery_text)
+
+tool_group.add(tool_rect)
+tool_group.add(tool_line)
+tool_group.add(tool_text)
+//tool_group.add(propery_text)
 
 /*********************************************************************************************************/
 /*********************************************************************************************************/
@@ -98,16 +146,16 @@ var propery_text = new Konva.Text({
 /*********************************************************************************************************/
 /*********************************************************************************************************/
 
-//adding toolbox to object container
-layer.add(right_rect)
-layer.add(right_text)
-layer.add(propery_text)
-
 //adding building blocks
 add_layers(layers)
 
 //adding button controls
 add_button()
+
+
+//adding toolbox to object container
+layer.add(tool_group)
+prop_layer.add(prop_group)
 
 //adding object containers to stage
 stage.add(layer);
@@ -164,6 +212,14 @@ function extractor(){
     var keys = Object.keys(extras)
     for(var i = 0; i < keys.length; i++){
       obj[keys[i]] = extras[keys[i]]
+      if(typeof(extras[keys[i]]) !== typeof(Array())){
+        var ans = extras[keys[i]].split(',').map(function(val){
+          return parseInt(val)
+        })
+        if(ans.length == 1)
+          ans = ans[0]
+        obj[keys[i]] = ans
+      }
     }
     olayers.push(obj)
     cur = lineLayer.find('#' + cur.getAttr('out'))
@@ -185,7 +241,7 @@ function extractor(){
 
 //adds button controls, uses AddItem
 function add_button(){
-  addItem(layer, stage, {text: 'Generate Model', background_color: 'seagreen', color: 'white', x : stage.getWidth() - 400 + 120, y : 500, isDraggable: false, isFancy : true, name: 'button', extras: {}}, button_handler);
+  addItem(layer, stage, {text: 'Generate Model', background_color: 'seagreen', color: 'white', x : 80, y : 450, isDraggable: false, isFancy : true, name: 'button', extras: {}}, button_handler);
 }
 
 //handles buttons events
@@ -230,7 +286,7 @@ function addItem(layer, stage, prop, handler = null) {
     });
 
     item.add(new Konva.Tag({
-        fill: "#eef3f3",//prop.background_color,
+        fill: /*"#eef3f3",*/prop.background_color,
         cornerRadius: 5,
         stroke: "#ffffff",
         strokeWidth: 2
@@ -241,7 +297,7 @@ function addItem(layer, stage, prop, handler = null) {
         fontFamily: 'Calibri',
         fontSize: 18,
         padding: 20,
-        fill: '#555555'//prop.color
+        fill: /*'#555555'*/prop.color
     }));
 
     if( handler == null)
@@ -249,7 +305,7 @@ function addItem(layer, stage, prop, handler = null) {
 
     if(prop.isFancy)
         handler(item)
-    layer.add(item)
+    tool_group.add(item)
 }
 
 //add all building blocks to object container, uses addItem
@@ -258,7 +314,7 @@ function add_layers(layers){
     for(var i = 0; i < keys.length; i++){
       var list = layers[keys[i]]
       for(var j = 0; j < list.length; j++){
-        addItem(layer, stage, {text: list[j].text, background_color: list[j].color, color: 'white', x : stage.getWidth() - 400 + list[j].x, y : list[j].y, isDraggable: true, isFancy : true, name: keys[i], extras: list[j].extras}, tool_handler);
+        addItem(layer, stage, {text: list[j].text, background_color: list[j].color/*'#eef3f3'*/, color: 'white'/*'#555555'*/, x : list[j].x, y : list[j].y, isDraggable: true, isFancy : true, name: keys[i], extras: list[j].extras}, tool_handler);
       }
     }
 }
@@ -313,7 +369,7 @@ function tool_handler(item){
         var shape = item;
 
         item.stopDrag()
-        var clone = item.clone({isFixed: false, name: item.getAttr('child_name'), id: 'node' + (layer.children.length + ++obj_count), in: null, out: null})
+        var clone = item.clone({isFixed: false, name: item.getAttr('child_name'), id: 'node' + (layer.children.length + ++obj_count), in: null, out: null, x: item.getAbsolutePosition().x, y: item.getAbsolutePosition().y})
         clone.off('dragstart')
         clone.on('dragend', function(evt){
           var shape = item;
@@ -336,7 +392,7 @@ function tool_handler(item){
               }
               _out[0].destroy()
             }
-            prop_layer.clear()
+            //prop_layer.clear()
             layer.draw()
             setTimeout(function(){evt.target.destroy()}, 100)
           }
@@ -393,7 +449,10 @@ function tool_handler(item){
 //checks if object is in toolbox
 function object_in_tools(){
   var item = stage.getPointerPosition();
-  return (item.x > stage.getWidth() - 400)
+  var tool = layer.find('#tool')[0]
+  var tool_pos = tool.getAbsolutePosition()
+  
+  return (item.x > tool_pos.x && item.y > tool_pos.y && item.x < tool_pos.x + tool.children[0].getWidth() && item.y < tool_pos.y + tool.children[0].getHeight())
 }
 
 //adds tweens to drag and drop
@@ -429,6 +488,7 @@ function fancy_dnd(item){
         });
 
         tween.play();
+        
     });
 }
 
@@ -446,17 +506,17 @@ function render_property_window(){
   if(active_prop == null)
     return
   
-  prop_layer.clear()
+  //prop_layer.clear()
   if(props != null && props.length > 0){
     for(var i = 0; i < props.length; i++){
       props[i].lable.destroy()
+      props[i].field.destroy()
     }
     props = []
   }
-  layer.draw()
     
   var prop = layer.find('#' + active_prop.getAttr('id'))[0].getAttr('extras')
-  var render_offset = 600
+  var render_offset = 30
   
   var keys = Object.keys(prop)
   
@@ -467,6 +527,8 @@ function render_property_window(){
     render_offset += 40
   }
   
+  prop_layer.draw()
+  
   for(var i = 0; i < props.length; i++){
     props[i].field.render()
   }
@@ -476,26 +538,27 @@ function render_property_window(){
 //renders a single property at specified location
 function render_prop(y, key, val){
   var txt = new Konva.Text({
-    x: stage.getWidth() - 380,
+    x: 0,
     y: y,
-    text: key,
+    text: to_title_case(key.replace('_', ' ')),
     fontFamily: 'Calibri',
     fontSize: 18,
     padding: 20,
-    fill: 'black',
+    fill: '#555555',
     id: 'prop' + prop_count + 1
   });
   
-  layer.add(txt)
-  layer.draw()
+  prop_group.add(txt)
+  
+  var prop_win_pos = prop_group.getAbsolutePosition()
   
   var input = new CanvasInput({
     canvas: $('#container canvas')[2],
     fontSize: 12,
-    x: stage.getWidth() - 200,
-    y: y + 15,
-    fontFamily: 'Arial',
-    fontColor: '#212121',
+    x: stage.getWidth() - 300 + 150,
+    y: y + 25,
+    fontFamily: 'Calibri',
+    fontColor: '#555555',
     //fontWeight: 'bold',
     width: 100,
     padding: 3,
@@ -524,6 +587,13 @@ function render_prop(y, key, val){
   props.push({lable: txt, field: input})
 }
 
+
+//normal text to title case
+function to_title_case(text){
+  return text.replace(/\w\S*/g, function(word){
+    return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase()
+  })
+}
 /*********************************************************************************************************/
 /*********************************************************************************************************/
 /******************************************* Code ends here **********************************************/
