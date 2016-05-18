@@ -336,6 +336,8 @@ function tool_handler(item){
               }
               _out[0].destroy()
             }
+            prop_layer.clear()
+            layer.draw()
             setTimeout(function(){evt.target.destroy()}, 100)
           }
         })
@@ -444,23 +446,21 @@ function render_property_window(){
   if(active_prop == null)
     return
   
+  prop_layer.clear()
   if(props != null && props.length > 0){
     for(var i = 0; i < props.length; i++){
       props[i].lable.destroy()
     }
-    prop_layer.clear()
     props = []
   }
+  layer.draw()
     
   var prop = layer.find('#' + active_prop.getAttr('id'))[0].getAttr('extras')
-  console.log(prop)
   var render_offset = 600
   
   var keys = Object.keys(prop)
-  console.log(keys)
   
   props = []
-  console.log(props)
   
   for(var i = 0; i < keys.length; i++){
     render_prop(render_offset, keys[i], prop[keys[i]])
@@ -471,7 +471,6 @@ function render_property_window(){
     props[i].field.render()
   }
   
-  console.log(props)
 }
 
 //renders a single property at specified location
