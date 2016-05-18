@@ -36,7 +36,10 @@ var socket = io();
 //for making connections
 var activeObj = null,
     activeLine = null,
-    acting = false
+    acting = false,
+    active_prop = null,
+    props = null,
+    prop_count = 0
 
 //for easing effect
 var tween = null;
@@ -55,6 +58,7 @@ var stage = new Konva.Stage({
 //adding two object containers, one for building blocks and other for connections
 var layer = new Konva.Layer();
 var lineLayer = new Konva.Layer()
+var prop_layer = new Konva.Layer();
 
 //space for toolbox at right side
 var right_rect = new Konva.Rect({
@@ -77,6 +81,17 @@ var right_text = new Konva.Text({
   fill: '#999'
 });
 
+//** adding property window
+
+var propery_text = new Konva.Text({
+  x: stage.getWidth() - 390,
+  y: 580,
+  text: 'Properties',
+  fontSize: 24,
+  fontFamily: 'Calibri',
+  fill: '#999'
+});
+
 /*********************************************************************************************************/
 /*********************************************************************************************************/
 /******************************************* Firing up tools *********************************************/
@@ -86,6 +101,7 @@ var right_text = new Konva.Text({
 //adding toolbox to object container
 layer.add(right_rect)
 layer.add(right_text)
+layer.add(propery_text)
 
 //adding building blocks
 add_layers(layers)
@@ -96,6 +112,7 @@ add_button()
 //adding object containers to stage
 stage.add(layer);
 stage.add(lineLayer)
+stage.add(prop_layer)
 
 //event handlers
 layer.on('beforeDraw', function() {
@@ -201,7 +218,7 @@ function addItem(layer, stage, prop, handler = null) {
     var item = new Konva.Label({
         x: prop.x,
         y: prop.y,
-        opacity: 0.75,
+        opacity: 1,//0.75,
         draggable: prop.isDraggable,
         startScale: 1,
         startX: prop.x,
@@ -213,7 +230,10 @@ function addItem(layer, stage, prop, handler = null) {
     });
 
     item.add(new Konva.Tag({
-        fill: prop.background_color
+        fill: "#eef3f3",//prop.background_color,
+        cornerRadius: 5,
+        stroke: "#ffffff",
+        strokeWidth: 2
     }));
 
     item.add(new Konva.Text({
@@ -221,7 +241,7 @@ function addItem(layer, stage, prop, handler = null) {
         fontFamily: 'Calibri',
         fontSize: 18,
         padding: 20,
-        fill: prop.color
+        fill: '#555555'//prop.color
     }));
 
     if( handler == null)
@@ -319,6 +339,12 @@ function tool_handler(item){
             setTimeout(function(){evt.target.destroy()}, 100)
           }
         })
+        
+        clone.on('click',function(){
+          active_prop = clone
+          render_property_window()
+        })
+        
         clone.on('dblclick', function(evt){
           if(clone.getAttr('out') != null)
             return
@@ -330,12 +356,12 @@ function tool_handler(item){
             x: 0,
             y: 0,
             points: [clone.getAbsolutePosition().x + clone.getWidth()/2, clone.getAbsolutePosition().y + clone.getHeight(), stage.getPointerPosition().x + 100, stage.getPointerPosition().y + 100],
-            pointerLength: 20,
-            pointerWidth : 20,
-            fill: 'black',
+            pointerLength: 5,
+            pointerWidth : 5,
+            fill: '#555555',
             stroke: 'black',
-            strokeWidth: 3,
-            opacity: 0.3,
+            strokeWidth: 1,
+            opacity: 0.8,
             name: 'arrow',
             input: clone.getAttr('id'),
             output: null,
@@ -411,6 +437,92 @@ function mouse_move_handler(){
   }
 
   handle_connections()
+}
+
+//renders properties of active_prop object
+function render_property_window(){
+  if(active_prop == null)
+    return
+  
+  if(props != null && props.length > 0){
+    for(var i = 0; i < props.length; i++){
+      props[i].lable.destroy()
+    }
+    prop_layer.clear()
+    props = []
+  }
+    
+  var prop = layer.find('#' + active_prop.getAttr('id'))[0].getAttr('extras')
+  console.log(prop)
+  var render_offset = 600
+  
+  var keys = Object.keys(prop)
+  console.log(keys)
+  
+  props = []
+  console.log(props)
+  
+  for(var i = 0; i < keys.length; i++){
+    render_prop(render_offset, keys[i], prop[keys[i]])
+    render_offset += 40
+  }
+  
+  for(var i = 0; i < props.length; i++){
+    props[i].field.render()
+  }
+  
+  console.log(props)
+}
+
+//renders a single property at specified location
+function render_prop(y, key, val){
+  var txt = new Konva.Text({
+    x: stage.getWidth() - 380,
+    y: y,
+    text: key,
+    fontFamily: 'Calibri',
+    fontSize: 18,
+    padding: 20,
+    fill: 'black',
+    id: 'prop' + prop_count + 1
+  });
+  
+  layer.add(txt)
+  layer.draw()
+  
+  var input = new CanvasInput({
+    canvas: $('#container canvas')[2],
+    fontSize: 12,
+    x: stage.getWidth() - 200,
+    y: y + 15,
+    fontFamily: 'Arial',
+    fontColor: '#212121',
+    //fontWeight: 'bold',
+    width: 100,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 1,
+    //boxShadow: '1px 1px 0px #fff',
+    innerShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)',
+    placeHolder: '',
+    value: val,
+    onkeydown: function(e){
+      if(e.keyCode == 13){
+        input.blur()
+      }
+    },
+    onblur: function(){
+      var ext = active_prop.getAttr('extras')
+      if(ext[key] !== undefined)
+        ext[key] = input.value()
+      active_prop.setAttrs({
+        extras: ext
+      })
+    }
+  });
+  
+  props.push({lable: txt, field: input})
 }
 
 /*********************************************************************************************************/
