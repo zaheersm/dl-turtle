@@ -22,7 +22,7 @@ socket.on('cal', function(val){
 
         for(var j = 0; j < 3; j++){//data.probs[0].length
             var li = $(ele).find('.outer')[j]
-            $(li).find('.lable').html(data.labels[i][j])
+            $(li).find('.lable').html(data.label_names[data.labels[i][j]])
             $(li).find('.inner').attr("data-progress", data.probs[i][j].toFixed(2) * 100 + "%")
         }
     }
