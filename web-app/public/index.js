@@ -6,7 +6,7 @@ function render_vals(){
     $.each(skillBar, function(){
         var skillVal = $(this).attr("data-progress");
         $(this).animate({
-            width: (parseInt(skillVal) * 0.8) + '%'
+            width: (parseInt(skillVal) * 0.6) + '%'
         }, 1000);
     })	
 }
