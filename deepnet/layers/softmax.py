@@ -10,12 +10,14 @@ class SoftMax(object):
         # Init Weights and bias
         self.W = theano.shared(
                         name = 'SoftMax.W',
-                        value = np.zeros((n_in, n_out), dtype= np.float64),
+                        value = np.zeros((n_in, n_out), 
+                        dtype= theano.config.floatX),
                         borrow = True)
         
         self.b = theano.shared(
                         name = 'SoftMax.b',
-                        value = np.zeros((n_out,), dtype = np.float64),
+                        value = np.zeros((n_out,), 
+                        dtype = theano.config.floatX),
                         borrow = True)
         
         # Probability distribution over n_out classes

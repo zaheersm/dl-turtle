@@ -119,7 +119,7 @@ class Architecture(object):
             
         #print self.lout_shape[index]
 
-    def load (self, train, valid, test, label_names):
+    def load (self, train, valid, test, label_names=None):
         """
             train : (X, y) 
             valid : (X, y)
@@ -129,8 +129,13 @@ class Architecture(object):
         self.train_set_x, self.train_set_y = shared_dataset(train)
         self.valid_set_x, self.valid_set_y = shared_dataset(valid)
         self.test_set_x, self.test_set_y = shared_dataset(test)
-        self.label_names = label_names
-
+        
+        if label_names == None:
+            # If no label names are passed, then default labels are
+            # the index themselves
+            self.label_names = range(len(np.unique(self.test_set_y.eval())))
+        else:
+            self.label_names = label_names
         n_train = self.train_set_x.get_value(borrow=True).shape[0]
         n_valid = self.valid_set_x.get_value(borrow=True).shape[0]
         n_test = self.test_set_x.get_value(borrow=True).shape[0]
