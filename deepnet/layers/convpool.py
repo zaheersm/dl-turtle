@@ -23,9 +23,9 @@ class ConvPool(object):
 
         W_bound = np.sqrt(6./ (fan_in + fan_out))
 
-        W_init = rng.uniform(low = -W_bound, high = W_bound,
-                            size = filter_shape)
-        b_init = np.zeros((filter_shape[0],), dtype = np.float64)
+        W_init = np.array(rng.uniform(low = -W_bound, high = W_bound,
+                            size = filter_shape), dtype = theano.config.floatX)
+        b_init = np.zeros((filter_shape[0],), dtype = theano.config.floatX)
 
         self.W = theano.shared(
                         name = 'Conv.W',
