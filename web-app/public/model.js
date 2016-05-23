@@ -138,7 +138,6 @@ prop_group.add(propery_text)
 tool_group.add(tool_rect)
 tool_group.add(tool_line)
 tool_group.add(tool_text)
-//tool_group.add(propery_text)
 
 /*********************************************************************************************************/
 /*********************************************************************************************************/
@@ -274,7 +273,7 @@ function addItem(layer, stage, prop, handler = null) {
     var item = new Konva.Label({
         x: prop.x,
         y: prop.y,
-        opacity: 1,//0.75,
+        opacity: 1,
         draggable: prop.isDraggable,
         startScale: 1,
         startX: prop.x,
@@ -286,7 +285,7 @@ function addItem(layer, stage, prop, handler = null) {
     });
 
     item.add(new Konva.Tag({
-        fill: /*"#eef3f3",*/prop.background_color,
+        fill: prop.background_color,
         cornerRadius: 5,
         stroke: "#ffffff",
         strokeWidth: 2
@@ -297,7 +296,7 @@ function addItem(layer, stage, prop, handler = null) {
         fontFamily: 'Calibri',
         fontSize: 18,
         padding: 20,
-        fill: /*'#555555'*/prop.color
+        fill: prop.color
     }));
 
     if( handler == null)
@@ -378,21 +377,20 @@ function tool_handler(item){
             var _out = lineLayer.find('#' + evt.target.getAttr('out'))
             if(_in.length > 0){
               var input = layer.find('#' + _in[0].getAttr('input'));
-              //var output = layer.find('#' + _in.getAttr('output'));
+              
               if(input.length > 0){
                 input[0].setAttrs({out: null})
               }
               _in[0].destroy()
             }
             if(_out.length > 0){
-              //var input = layer.find('#' + _out.getAttr('input'));
               var output = layer.find('#' + _out[0].getAttr('output'));
               if(output.length > 0){
                 output[0].setAttrs({in: null})
               }
               _out[0].destroy()
             }
-            //prop_layer.clear()
+            
             layer.draw()
             setTimeout(function(){evt.target.destroy()}, 100)
           }
@@ -506,7 +504,6 @@ function render_property_window(){
   if(active_prop == null)
     return
   
-  //prop_layer.clear()
   if(props != null && props.length > 0){
     for(var i = 0; i < props.length; i++){
       props[i].lable.destroy()
@@ -559,13 +556,11 @@ function render_prop(y, key, val){
     y: y + 25,
     fontFamily: 'Calibri',
     fontColor: '#555555',
-    //fontWeight: 'bold',
     width: 100,
     padding: 3,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 1,
-    //boxShadow: '1px 1px 0px #fff',
     innerShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)',
     placeHolder: '',
     value: val,
