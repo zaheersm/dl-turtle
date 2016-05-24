@@ -1,5 +1,5 @@
-Deep Learning Model Builder and Analyser [dl-turtle]
-====================================================
+Deep Learning Model Builder and Analyser 
+========================================
 
 dl-turtle is a wrapper library around Theano which allows user to build 
 deep learning models, set parameters, start and analyse training. dl-turtle 
@@ -15,24 +15,24 @@ user to view how the training is progressing using rich visualizations.
 
 Modules
 -------
-###Canvas based HTML5 UI 
+####Canvas based HTML5 UI 
 Web frontend for building the model graph and sending equivalent JSON 
 representation to server
 
-###Model Builder
+####Model Builder
 Parses JSON representation and builds equivalent model in Theano
 
-###Data Handler
+####Data Handler
 Handles standard datasets (currently supported datasets: MNIST, CIFAR)
 
-###Optimizer
+####Optimizer
 Takes the model and minimizes it using 'Gradient Descent' algorithms
 
-###Layers
+####Layers
 Basic building blocks of the deep net 
 (currently supported layers: convolution, pool, FC, softmax)
 
-###Sampler
+####Sampler
 Samples 3 random images from test set and sends back the top-three 
 guesses for those images to the front-end
 
