@@ -15,25 +15,26 @@ user to view how the training is progressing using rich visualizations.
 
 Modules
 -------
-1. Canvas based HTML5 UI 
-	Web frontend for building the model graph and sending equivalent JSON 
-	representation to server
+###Canvas based HTML5 UI 
+Web frontend for building the model graph and sending equivalent JSON 
+representation to server
 
-2. Model Builder
-	Parses JSON representation and builds equivalent model in Theano
+###Model Builder
+Parses JSON representation and builds equivalent model in Theano
 
-3. Data Handler
-	Handles standard datasets (currently supported datasets: MNIST, CIFAR)
+###Data Handler
+Handles standard datasets (currently supported datasets: MNIST, CIFAR)
 
-4. Optimizer
-	Takes the model and minimizes it using 'Gradient Descent' algorithms
+###Optimizer
+Takes the model and minimizes it using 'Gradient Descent' algorithms
 
-5. Layers
-	Basic building blocks of the deep net 
-	(currently supported layers: convolution, pool, FC, softmax)
-6. Sampler
-	Samples 3 random images from test set and sends back the top-three 
-	guesses for those images to the front-end
+###Layers
+Basic building blocks of the deep net 
+(currently supported layers: convolution, pool, FC, softmax)
+
+###Sampler
+Samples 3 random images from test set and sends back the top-three 
+guesses for those images to the front-end
 
 Work flow
 ---------
